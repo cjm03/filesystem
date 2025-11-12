@@ -12,15 +12,11 @@ int main(void)
     }
 
     FSNode* n = FSMkdir(root, "/dev/disk");
-    if (!n) { fprintf(stderr, "FSMkdir failed\n"); FSFree(root); return 1; }
     n = FSMkdir(root, "/sys");
-    if (!n) { fprintf(stderr, "FSMkdir failed\n"); FSFree(root); return 1; }
     n = FSMkdir(root, "/etc");
-    if (!n) { fprintf(stderr, "FSMkdir failed\n"); FSFree(root); return 1; }
     n = FSMkdir(root, "/home/user/crab");
-    if (!n) { fprintf(stderr, "FSMkdir failed\n"); FSFree(root); return 1; }
-    FSNode* pass = FSCreateFile(root, "/etc/passwd", "root:x:0:0:root:/root:/bin/bash\nuser:x:1000:1000::/home/user:/bin/bash\n");
-    if (!pass) { fprintf(stderr, "FSCreateFile failed\n"); FSFree(root); return 1; }
+    n = FSCreateFile(root, "/etc/passwd", "root:x:0:0:root:/root:/bin/bash\nuser:x:1000:1000::/home/user:/bin/bash\n");
+    n = FSCreateFile(root, "/etc/shadow", "nobody:!*:20383:::::1:\n");
 
     printf("Initial tree:\n");
     FSPrintTree(root);
@@ -32,17 +28,20 @@ int main(void)
     char def[PATH_SIZE];
     strcpy(def, "/");
     FSNode* cur = root;
+
     while (1) {
+
         printf("%s > ", def);
-        if (scanf("%15s", choice) != 1) {
-            break;
-        }
+
+        if (scanf("%15s", choice) != 1) break;
+
         if (strncmp(choice, "q", 1) == 0) {
             break;
+
         } else {
-            if (scanf(" %255s", path) != 1) {
-                path[0] = '\0';
-            }
+
+            if (scanf(" %255s", path) != 1) path[0] = '\0';
+
             if (strncmp(choice, "cd", 2) == 0) {
                 FSNode* target = FSFind(root, path);
                 if (target) {
